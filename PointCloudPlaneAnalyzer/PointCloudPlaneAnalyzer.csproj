@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Csv" Version="2.0.93" />
+    <PackageReference Include="DryIoc.Microsoft.DependencyInjection.Extension" Version="1.0.0.2" />
+    <PackageReference Include="HelixToolkit.Wpf" Version="2.24.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="PclSharp" Version="1.8.1.20180820-beta07" />
+    <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
+    <PackageReference Include="ReactiveProperty" Version="9.1.2" />
+  </ItemGroup>
+</Project>
