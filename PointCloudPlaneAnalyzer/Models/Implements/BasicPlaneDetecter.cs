@@ -4,30 +4,61 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows.Media;
 
 namespace PointCloudPlaneAnalyzer.Models.Implements
 {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct StructPoint3D
+    {
+        public float X;
+        public float Y;
+        public float Z;
+    };
+
     public class BasicPlaneDetecter : IPlaneDetect
     {
+
         public List<PointCloudVoxel> GetPlaneVoxels(List<PointCloudVoxel> rawVoxels, int errorMm)
+            => getPlaneVoxelsUseStructArray(rawVoxels, errorMm);
+
+
+
+        private List<PointCloudVoxel> getPlaneVoxelsUseStructArray(List<PointCloudVoxel> rawVoxels, int errorMm)
         {
-            var calcPlane = new CalcPlane();
-            var result = calcPlane.SumSamplingData(rawVoxels.Select(x => new System.Numerics.Vector3((float)x.point.X, (float)x.point.Y, (float)x.point.Z)).ToList());
-            float a = result[0];
-            float b = result[1];
-            float c = result[2];
+            var retDataBase = rawVoxels.Select(x => new StructPoint3D() { X = (float)x.point.X, Y = (float)x.point.Y, Z = (float)x.point.Z }).ToArray();
+            int planeSize = 0;
+            var planeData = new StructPoint3D[retDataBase.Count()];
+            var msg = new char[500];
 
-            // サンプリングした最後のデータを用いて、理想平面の値を求める
-            var v = rawVoxels.Last().point;
+            NativeMethod.CalcPlaneStruct(retDataBase, rawVoxels.Count, planeData, ref planeSize, errorMm/1000);
 
-            float y = a + (b * (float)v.X) + (c * (float)v.Z);
+            var retData = new List<PointCloudVoxel>();
+            for (int i = 0; i < planeSize; i++)
+            {
+                retData.Add(new PointCloudVoxel(new System.Windows.Media.Media3D.Point3D(planeData[i].X, planeData[i].Y, planeData[i].Z), Colors.Beige));
+            }
 
-            return rawVoxels.Select(x => new PointCloudVoxel(new System.Windows.Media.Media3D.Point3D(v.X, a + (b * (float)v.X) + (c * (float)v.Z),v.Z), x.color)).ToList();
-
-
+            return retData;
         }
+    }
+    public static class NativeMethod
+    {
+#if DEBUG
+        [DllImport("..\\..\\..\\..\\bin\\Debug\\PCLPlaneDetector.dll")]
+#else
+        [DllImport("..\\..\\..\\..\\bin\\Release\\PCLPlaneDetector.dll")]
+#endif
+        public static extern void CalcPlane(System.IntPtr rawdata, int elemCount, System.IntPtr planedataptr, ref int planeDataSize, ref char[] msg); //引数はref ([out, in]でも可能...?未検証）
+
+#if DEBUG
+        [DllImport("..\\..\\..\\..\\bin\\Debug\\PCLPlaneDetector.dll")]
+#else
+        [DllImport("..\\..\\..\\..\\bin\\Release\\PCLPlaneDetector.dll")]
+#endif
+        public static extern void CalcPlaneStruct([In, Out] StructPoint3D[] points, int elementCount, [In, Out] StructPoint3D[] returnData, ref int returnDataCount, float errorMm);
     }
 }
