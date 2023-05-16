@@ -11,6 +11,7 @@ using System.Windows.Media;
 
 namespace PointCloudPlaneAnalyzer.Models.Implements
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct StructPoint3D
     {
         public float X;
@@ -22,31 +23,25 @@ namespace PointCloudPlaneAnalyzer.Models.Implements
     {
 
         public List<PointCloudVoxel> GetPlaneVoxels(List<PointCloudVoxel> rawVoxels, int errorMm)
+            => getPlaneVoxelsUseStructArray(rawVoxels, errorMm);
+
+
+
+        private List<PointCloudVoxel> getPlaneVoxelsUseStructArray(List<PointCloudVoxel> rawVoxels, int errorMm)
         {
-            var retDataBase = rawVoxels.SelectMany(x => new float[] { (float)x.point.X, (float)x.point.Y, (float)x.point.Z }).ToArray();
+            var retDataBase = rawVoxels.Select(x => new StructPoint3D() { X = (float)x.point.X, Y = (float)x.point.Y, Z = (float)x.point.Z }).ToArray();
             int planeSize = 0;
-            var planeData = new float[retDataBase.Count()];
+            var planeData = new StructPoint3D[retDataBase.Count()];
             var msg = new char[500];
 
-            int rawdatasize = Marshal.SizeOf(typeof(float)) * retDataBase.Length;
-            System.IntPtr rawdataptr = Marshal.AllocCoTaskMem(rawdatasize);
-            Marshal.Copy(retDataBase, 0, rawdataptr, retDataBase.Length);
+            NativeMethod.CalcPlaneStruct(retDataBase, rawVoxels.Count, planeData, ref planeSize, errorMm/1000);
 
-            int planedatasize = Marshal.SizeOf(typeof(float)) * retDataBase.Length;
-            System.IntPtr planedataptr = Marshal.AllocCoTaskMem(planedatasize);
-
-            NativeMethod.CalcPlane(rawdataptr, rawVoxels.Count, planedataptr,ref planeSize,ref msg);
-
-
-            Marshal.Copy(planedataptr, planeData, 0, planeSize);
             var retData = new List<PointCloudVoxel>();
             for (int i = 0; i < planeSize; i++)
             {
-                retData.Add(new PointCloudVoxel(new System.Windows.Media.Media3D.Point3D(planeData[i * 3], planeData[i * 3 + 1], planeData[i * 3 + 2]), Colors.Beige));
+                retData.Add(new PointCloudVoxel(new System.Windows.Media.Media3D.Point3D(planeData[i].X, planeData[i].Y, planeData[i].Z), Colors.Beige));
             }
 
-            Marshal.FreeCoTaskMem(rawdataptr);
-            Marshal.FreeCoTaskMem(planedataptr);
             return retData;
         }
     }
@@ -57,6 +52,13 @@ namespace PointCloudPlaneAnalyzer.Models.Implements
 #else
         [DllImport("..\\..\\..\\..\\bin\\Release\\PCLPlaneDetector.dll")]
 #endif
-        public static extern void CalcPlane(System.IntPtr rawdata, int elemCount, System.IntPtr planedataptr, ref int planeDataSize,ref char[] msg); //引数はref ([out, in]でも可能...?未検証）
+        public static extern void CalcPlane(System.IntPtr rawdata, int elemCount, System.IntPtr planedataptr, ref int planeDataSize, ref char[] msg); //引数はref ([out, in]でも可能...?未検証）
+
+#if DEBUG
+        [DllImport("..\\..\\..\\..\\bin\\Debug\\PCLPlaneDetector.dll")]
+#else
+        [DllImport("..\\..\\..\\..\\bin\\Release\\PCLPlaneDetector.dll")]
+#endif
+        public static extern void CalcPlaneStruct([In, Out] StructPoint3D[] points, int elementCount, [In, Out] StructPoint3D[] returnData, ref int returnDataCount, float errorMm);
     }
 }
