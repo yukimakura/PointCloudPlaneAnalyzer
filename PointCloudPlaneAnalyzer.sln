@@ -5,16 +5,42 @@ VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointCloudPlaneAnalyzer", "PointCloudPlaneAnalyzer\PointCloudPlaneAnalyzer.csproj", "{4562ADFB-4DCA-467F-9813-61AF6433BEA7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PCLPlaneDetector", "PCLPlaneDetector\PCLPlaneDetector.vcxproj", "{6E9686AC-A95C-4294-93C7-84CBD7412326}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Debug|x64.Build.0 = Debug|Any CPU
+		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Debug|x86.Build.0 = Debug|Any CPU
 		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Release|x64.ActiveCfg = Release|Any CPU
+		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Release|x64.Build.0 = Release|Any CPU
+		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Release|x86.ActiveCfg = Release|Any CPU
+		{4562ADFB-4DCA-467F-9813-61AF6433BEA7}.Release|x86.Build.0 = Release|Any CPU
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Debug|Any CPU.Build.0 = Debug|x64
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Debug|x64.ActiveCfg = Debug|x64
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Debug|x64.Build.0 = Debug|x64
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Debug|x86.ActiveCfg = Debug|Win32
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Debug|x86.Build.0 = Debug|Win32
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Release|Any CPU.ActiveCfg = Release|x64
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Release|Any CPU.Build.0 = Release|x64
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Release|x64.ActiveCfg = Release|x64
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Release|x64.Build.0 = Release|x64
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Release|x86.ActiveCfg = Release|Win32
+		{6E9686AC-A95C-4294-93C7-84CBD7412326}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
