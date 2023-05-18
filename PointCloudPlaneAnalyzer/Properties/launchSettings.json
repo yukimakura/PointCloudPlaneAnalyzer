@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PointCloudPlaneAnalyzer": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

@@ -29,9 +29,11 @@ namespace PointCloudPlaneAnalyzer.ViewModels
     {
 
         private IReadPointCloud readPointCloud;
+        private IRotatePointCloud rotatePointCloud;
         private IPlaneDetect planeDetect;
 
         private ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber;
+        private ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber;
 
 
         private string _title = "PointCloudPlaneAnalyzer";
@@ -48,11 +50,13 @@ namespace PointCloudPlaneAnalyzer.ViewModels
 
         private Model3D pclModel = new Model3DGroup();
 
-        public MainWindowViewModel(IReadPointCloud readPointCloud, IPlaneDetect planeDetect, ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber)
+        public MainWindowViewModel(IReadPointCloud readPointCloud, IPlaneDetect planeDetect, IRotatePointCloud rotatePointCloud, ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber, ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber)
         {
             this.readPointCloud = readPointCloud;
             this.planeDetect = planeDetect;
             this.executePlainDetectSubscriber = executePlainDetectSubscriber;
+            this.rotatePointCloudSubscriber = rotatePointCloudSubscriber;
+            this.rotatePointCloud = rotatePointCloud;
         }
 
         public Model3D PCLModel
@@ -101,6 +105,50 @@ namespace PointCloudPlaneAnalyzer.ViewModels
                         });
         }
 
+        public DelegateCommand SaveRawPCLCommand
+        {
+            get => new DelegateCommand(() =>
+            {
+                if (!rawPointCloudVoxelList.Any())
+                {
+                    MessageBox.Show("先に、点群ファイルを読み込んでください。");
+                    return;
+                }
+                // ダイアログのインスタンスを生成
+                var dialog = new SaveFileDialog();
+
+                // ファイルの種類を設定
+                dialog.Filter = "点群CSVファイル (*.csv)|*.csv|全てのファイル (*.*)|*.*";
+
+                // ダイアログを表示する
+                if (dialog.ShowDialog() == true)
+                {
+                    // 選択されたファイル名 (ファイルパス) をメッセージボックスに表示
+
+
+                    Title = $"保存した点群ファイル:{dialog.FileName}";
+
+                    // 書き込むヘッダー行を作成します
+                    string[] header = new string[] { "x", "y", "z", "r", "g", "b", };
+
+
+                    // データからCSV形式の文字列を生成します
+
+                    string outcsv = CsvWriter.WriteToText(header, rawPointCloudVoxelList.Select(p => new string[] {
+                        p.point.X.ToString(),
+                        p.point.Y.ToString(),
+                        p.point.Z.ToString(),
+                        p.color.R.ToString(),
+                        p.color.G.ToString(),
+                        p.color.B.ToString()
+                    }));
+
+                    // 文字列をファイルに出力します
+                    File.WriteAllText(dialog.FileName, outcsv);
+
+                }
+            });
+        }
         public DelegateCommand ExtractPlaneCommand
         {
             get => new DelegateCommand(() =>
@@ -195,6 +243,36 @@ namespace PointCloudPlaneAnalyzer.ViewModels
             });
         }
 
+        public DelegateCommand RotatePointCloudCommand
+        {
+            get => new DelegateCommand(() =>
+            {
+
+                var subwindow = new RotatePointCloudWindow();
+                subwindow.Show();
+
+                rotatePointCloudSubscriber.Subscribe(rotateProp =>
+                {
+                    subwindow.Close();
+                    rawPointCloudVoxelList = rotatePointCloud.GetRotatePointCloud(rawPointCloudVoxelList, rotateProp.roll, rotateProp.pitch, rotateProp.yaw);
+
+                    // Create a model group
+                    var modelGroup = new Model3DGroup();
+                    // Create a mesh builder and add a box to it
+                    var pointMeshBuilder = new MeshBuilder(false, false);
+                    foreach (var pv in rawPointCloudVoxelList)
+                    {
+                        pointMeshBuilder.AddBox(new Point3D(pv.point.Z, pv.point.X, -pv.point.Y), 0.003, 0.003, 0.003);
+                    }
+
+                    var pointMesh = pointMeshBuilder.ToMesh(true);
+
+                    modelGroup.Children.Add(genVoxel(pointMesh, new Point3D(0, 0, 0), Colors.Red));
+
+                    PCLModel = modelGroup;
+                });
+            });
+        }
 
         private GeometryModel3D genVoxel(MeshGeometry3D baseMesh, Point3D offsetPoint, Color color = default(Color))
             => new GeometryModel3D()
