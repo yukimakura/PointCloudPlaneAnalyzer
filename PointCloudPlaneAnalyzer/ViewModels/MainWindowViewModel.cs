@@ -34,6 +34,7 @@ namespace PointCloudPlaneAnalyzer.ViewModels
 
         private ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber;
         private ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber;
+        private ISubscriber<ClickMousePositionEventObject> clickMousePositionSubscriber;
 
 
         private string _title = "PointCloudPlaneAnalyzer";
@@ -43,6 +44,12 @@ namespace PointCloudPlaneAnalyzer.ViewModels
             set { SetProperty(ref _title, value); }
         }
 
+        private string selectingPointInfo = string.Empty;
+        public string SelectingPointInfo
+        {
+            get { return selectingPointInfo; }
+            set { SetProperty(ref selectingPointInfo, value); }
+        }
 
         private List<PointCloudVoxel> rawPointCloudVoxelList = new List<PointCloudVoxel>();
         private List<PointCloudVoxel> extractPointCloudVoxelList = new List<PointCloudVoxel>();
@@ -50,13 +57,24 @@ namespace PointCloudPlaneAnalyzer.ViewModels
 
         private Model3D pclModel = new Model3DGroup();
 
-        public MainWindowViewModel(IReadPointCloud readPointCloud, IPlaneDetect planeDetect, IRotatePointCloud rotatePointCloud, ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber, ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber)
+        public MainWindowViewModel(IReadPointCloud readPointCloud,
+                                   IPlaneDetect planeDetect,
+                                   IRotatePointCloud rotatePointCloud,
+                                   ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber,
+                                   ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber,
+                                   ISubscriber<ClickMousePositionEventObject> clickMousePositionSubscriber
+                                   )
         {
             this.readPointCloud = readPointCloud;
             this.planeDetect = planeDetect;
             this.executePlainDetectSubscriber = executePlainDetectSubscriber;
             this.rotatePointCloudSubscriber = rotatePointCloudSubscriber;
             this.rotatePointCloud = rotatePointCloud;
+            this.clickMousePositionSubscriber = clickMousePositionSubscriber;
+            this.clickMousePositionSubscriber.Subscribe(clickPoint => {
+                SelectingPointInfo = $"最後にクリックされたマウス座標:[X:{clickPoint.clickedMousePositon.X},Y:{clickPoint.clickedMousePositon.Y},Z:{clickPoint.clickedMousePositon.Z}] " +
+                                        $"{(clickPoint.clickedObjectPositon.HasValue ? $"最後にクリックされたオブジェクト座標 :[X:{clickPoint.clickedObjectPositon.Value.X}, Y:{clickPoint.clickedObjectPositon.Value.Y}, Z:{clickPoint.clickedObjectPositon.Value.Z}]" : string.Empty)}";
+            });
         }
 
         public Model3D PCLModel

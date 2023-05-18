@@ -4,11 +4,12 @@
         xmlns:prism="http://prismlibrary.com/"
         xmlns:ht="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        Title="{Binding Title}" Height="640" Width="480" >
+        Title="{Binding Title}" Height="720" Width="960" >
     <Grid x:Name="baseGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <Menu DockPanel.Dock="Top" Grid.Row="0">
             <MenuItem Header="ファイル">
@@ -19,14 +20,18 @@
                 <MenuItem Header="平面を抽出する" Command="{Binding ExtractPlaneCommand}" />
                 <MenuItem Header="抽出した点群をcsvに出力..." Command="{Binding ExportCSVCommand}" />
                 <MenuItem Header="インポートした点群を回転する" Command="{Binding RotatePointCloudCommand}" />
-                
+
             </MenuItem>
         </Menu>
         <!--<ContentControl prism:RegionManager.RegionName="ContentRegion" />-->
-        <ht:HelixViewport3D ZoomExtentsWhenLoaded="True" Grid.Row="1" >
+        <ht:HelixViewport3D x:Name="helixView" ZoomExtentsWhenLoaded="True" Grid.Row="1" MouseDown="HelixViewport3D_MouseDown" Cursor="Cross" CalculateCursorPosition="True" ShowFrameRate="True">
             <ht:GridLinesVisual3D Width="10" Length="10" MinorDistance="1" MajorDistance="1" Thickness="0.02"/>
             <ModelVisual3D x:Name="main3dview" Content="{Binding PCLModel, Mode=OneWay}"/>
             <ht:SunLight/>
         </ht:HelixViewport3D>
+        <StatusBar VerticalAlignment="Bottom" Margin="0,0,0,0" Grid.Row="1" Grid.RowSpan="2" >
+            <Label Content="{Binding SelectingPointInfo}"/>
+        </StatusBar>
     </Grid>
+    
 </Window>
