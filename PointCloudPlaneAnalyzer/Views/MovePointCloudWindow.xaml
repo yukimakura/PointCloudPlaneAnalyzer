@@ -1,0 +1,19 @@
+﻿<Window x:Class="PointCloudPlaneAnalyzer.Views.MovePointCloudWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             prism:ViewModelLocator.AutoWireViewModel="True"
+    Title="{Binding Title}" Height="240" Width="320" >
+    <Grid>
+        <Label Content="X軸 [m]" HorizontalAlignment="Left" Margin="95,15,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Center" Margin="0,40,0,0" TextWrapping="Wrap" Text="{Binding XTextBoxText}" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Y軸 [m]" HorizontalAlignment="Left" Margin="95,55,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Center" Margin="0,80,0,0" TextWrapping="Wrap" Text="{Binding YTextBoxText}" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Z軸 [m]" HorizontalAlignment="Left" Margin="95,95,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Center" Margin="0,120,0,0" TextWrapping="Wrap" Text="{Binding ZTextBoxText}" VerticalAlignment="Top" Width="120"/>
+
+        <Button Content="実行" HorizontalAlignment="Center" Margin="0,0,0,10" VerticalAlignment="Bottom" Command="{Binding MovePointCloudCommand}"/>
+
+
+    </Grid>
+</Window>

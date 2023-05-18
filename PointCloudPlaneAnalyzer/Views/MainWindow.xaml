@@ -20,6 +20,7 @@
                 <MenuItem Header="平面を抽出する" Command="{Binding ExtractPlaneCommand}" />
                 <MenuItem Header="抽出した点群をcsvに出力..." Command="{Binding ExportCSVCommand}" />
                 <MenuItem Header="インポートした点群を回転する" Command="{Binding RotatePointCloudCommand}" />
+                <MenuItem Header="インポートした点群を平行移動する" Command="{Binding MovePointCloudCommand}" />
 
             </MenuItem>
         </Menu>

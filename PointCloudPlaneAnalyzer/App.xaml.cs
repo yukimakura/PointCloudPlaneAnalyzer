@@ -25,6 +25,7 @@ namespace PointCloudPlaneAnalyzer
             containerRegistry.GetContainer().RegisterServices(servCol => {
                 servCol.AddSingleton<IPlaneDetect, BasicPlaneDetecter>();
                 servCol.AddSingleton<IRotatePointCloud, BasicRotatePointCloud>();
+                servCol.AddSingleton<IMovePointCloud, BasicMovePointCloud>();
                 servCol.AddSingleton<IReadPointCloud, CsvPointCloudReader>();
                 servCol.AddMessagePipe();
             });
