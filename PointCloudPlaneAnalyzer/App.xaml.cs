@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Prism.DryIoc;
 using Prism.Ioc;
 using System.Windows;
+using MessagePipe;
 
 namespace PointCloudPlaneAnalyzer
 {
@@ -24,6 +25,7 @@ namespace PointCloudPlaneAnalyzer
             containerRegistry.GetContainer().RegisterServices(servCol => {
                 servCol.AddSingleton<IPlaneDetect, BasicPlaneDetecter>();
                 servCol.AddSingleton<IReadPointCloud, CsvPointCloudReader>();
+                servCol.AddMessagePipe();
             });
         }
     }

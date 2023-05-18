@@ -34,7 +34,7 @@ namespace PointCloudPlaneAnalyzer.Models.Implements
             var planeData = new StructPoint3D[retDataBase.Count()];
             var msg = new char[500];
 
-            NativeMethod.CalcPlaneStruct(retDataBase, rawVoxels.Count, planeData, ref planeSize, errorMm/1000);
+            NativeMethod.CalcPlaneStruct(retDataBase, rawVoxels.Count, planeData, ref planeSize, (float)(errorMm/1000.0));
 
             var retData = new List<PointCloudVoxel>();
             for (int i = 0; i < planeSize; i++)
@@ -47,12 +47,6 @@ namespace PointCloudPlaneAnalyzer.Models.Implements
     }
     public static class NativeMethod
     {
-#if DEBUG
-        [DllImport("..\\..\\..\\..\\bin\\Debug\\PCLPlaneDetector.dll")]
-#else
-        [DllImport("..\\..\\..\\..\\bin\\Release\\PCLPlaneDetector.dll")]
-#endif
-        public static extern void CalcPlane(System.IntPtr rawdata, int elemCount, System.IntPtr planedataptr, ref int planeDataSize, ref char[] msg); //引数はref ([out, in]でも可能...?未検証）
 
 #if DEBUG
         [DllImport("..\\..\\..\\..\\bin\\Debug\\PCLPlaneDetector.dll")]

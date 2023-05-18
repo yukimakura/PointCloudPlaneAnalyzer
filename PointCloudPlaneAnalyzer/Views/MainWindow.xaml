@@ -13,11 +13,6 @@
         <Menu DockPanel.Dock="Top" Grid.Row="0">
             <MenuItem Header="ファイル">
                 <MenuItem Header="csvファイルを読み込む..." Command="{Binding LoadPCLCommand}" />
-                <!--<MenuItem Header="メニュー 1-2"/>
-                <MenuItem Header="メニュー 1-3">
-                    <MenuItem Header="メニュー 1-3-1"/>
-                    <MenuItem Header="メニュー 1-3-2"/>
-                </MenuItem>-->
             </MenuItem>
             <MenuItem Header="解析">
                 <MenuItem Header="平面を抽出する" Command="{Binding ExtractPlaneCommand}" />
