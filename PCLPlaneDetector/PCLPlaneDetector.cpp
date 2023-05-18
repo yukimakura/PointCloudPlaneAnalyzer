@@ -63,7 +63,7 @@ DLLEXPORT void __stdcall CalcPlaneStruct(StructPoint3D* points, int elementCount
 
 }
 
-DLLEXPORT void __stdcall TransfortPointCloud(StructPoint3D* points, int elementCount, StructPoint3D* returnData, int* returnDataCount,float roll,float pitch,float yaw)
+DLLEXPORT void __stdcall TransformPointCloud(StructPoint3D* points, int elementCount, StructPoint3D* returnData, int* returnDataCount,float roll,float pitch,float yaw,float x,float y,float z)
 {
 	//“ü—Í“_ŒQ
 	pcl::PointCloud<pcl::PointXYZ> inputPointcloud;
@@ -74,7 +74,7 @@ DLLEXPORT void __stdcall TransfortPointCloud(StructPoint3D* points, int elementC
 	}
 
 	pcl::PointCloud<pcl::PointXYZ> rotatedPointcloud;
-	Eigen::Affine3f tf = pcl::getTransformation(0, 0, 0, degToRad(roll), degToRad(pitch), degToRad(yaw));
+	Eigen::Affine3f tf = pcl::getTransformation(x, y, z, degToRad(roll), degToRad(pitch), degToRad(yaw));
 	pcl::transformPointCloud(inputPointcloud, rotatedPointcloud, tf,true);
 
 	(*returnDataCount) = rotatedPointcloud.size();

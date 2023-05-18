@@ -30,10 +30,12 @@ namespace PointCloudPlaneAnalyzer.ViewModels
 
         private IReadPointCloud readPointCloud;
         private IRotatePointCloud rotatePointCloud;
+        private IMovePointCloud movePointCloud;
         private IPlaneDetect planeDetect;
 
         private ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber;
         private ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber;
+        private ISubscriber<MovePointCloudEventObject> movePointCloudSubscriber;
         private ISubscriber<ClickMousePositionEventObject> clickMousePositionSubscriber;
 
 
@@ -60,8 +62,10 @@ namespace PointCloudPlaneAnalyzer.ViewModels
         public MainWindowViewModel(IReadPointCloud readPointCloud,
                                    IPlaneDetect planeDetect,
                                    IRotatePointCloud rotatePointCloud,
+                                   IMovePointCloud movePointCloud,
                                    ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber,
                                    ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber,
+                                   ISubscriber<MovePointCloudEventObject> movePointCloudSubscriber,
                                    ISubscriber<ClickMousePositionEventObject> clickMousePositionSubscriber
                                    )
         {
@@ -69,7 +73,9 @@ namespace PointCloudPlaneAnalyzer.ViewModels
             this.planeDetect = planeDetect;
             this.executePlainDetectSubscriber = executePlainDetectSubscriber;
             this.rotatePointCloudSubscriber = rotatePointCloudSubscriber;
+            this.movePointCloudSubscriber = movePointCloudSubscriber;
             this.rotatePointCloud = rotatePointCloud;
+            this.movePointCloud = movePointCloud;
             this.clickMousePositionSubscriber = clickMousePositionSubscriber;
             this.clickMousePositionSubscriber.Subscribe(clickPoint => {
                 SelectingPointInfo = $"最後にクリックされたマウス座標:[X:{clickPoint.clickedMousePositon.X},Y:{clickPoint.clickedMousePositon.Y},Z:{clickPoint.clickedMousePositon.Z}] " +
@@ -273,6 +279,37 @@ namespace PointCloudPlaneAnalyzer.ViewModels
                 {
                     subwindow.Close();
                     rawPointCloudVoxelList = rotatePointCloud.GetRotatePointCloud(rawPointCloudVoxelList, rotateProp.roll, rotateProp.pitch, rotateProp.yaw);
+
+                    // Create a model group
+                    var modelGroup = new Model3DGroup();
+                    // Create a mesh builder and add a box to it
+                    var pointMeshBuilder = new MeshBuilder(false, false);
+                    foreach (var pv in rawPointCloudVoxelList)
+                    {
+                        pointMeshBuilder.AddBox(new Point3D(pv.point.Z, pv.point.X, -pv.point.Y), 0.003, 0.003, 0.003);
+                    }
+
+                    var pointMesh = pointMeshBuilder.ToMesh(true);
+
+                    modelGroup.Children.Add(genVoxel(pointMesh, new Point3D(0, 0, 0), Colors.Red));
+
+                    PCLModel = modelGroup;
+                });
+            });
+        }
+
+        public DelegateCommand MovePointCloudCommand
+        {
+            get => new DelegateCommand(() =>
+            {
+
+                var subwindow = new MovePointCloudWindow();
+                subwindow.Show();
+
+                movePointCloudSubscriber.Subscribe(moveProp =>
+                {
+                    subwindow.Close();
+                    rawPointCloudVoxelList = movePointCloud.GetMovedPointCloud(rawPointCloudVoxelList,moveProp.x, moveProp.y, moveProp.z);
 
                     // Create a model group
                     var modelGroup = new Model3DGroup();

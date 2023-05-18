@@ -13,7 +13,7 @@ using System.Windows.Media;
 namespace PointCloudPlaneAnalyzer.Models.Implements
 {
 
-    public class BasicRotatePointCloud : IRotatePointCloud
+    public class BasicMovePointCloud : IMovePointCloud
     {
         [StructLayout(LayoutKind.Sequential)]
         public struct StructPoint3D
@@ -24,13 +24,13 @@ namespace PointCloudPlaneAnalyzer.Models.Implements
         };
 
 
-        public List<PointCloudVoxel> GetRotatePointCloud(List<PointCloudVoxel> rawVoxels, float roll, float pitch, float yaw)
+        public List<PointCloudVoxel> GetMovedPointCloud(List<PointCloudVoxel> rawVoxels, float x, float y, float z)
         {
             var retDataBase = rawVoxels.Select(x => new StructPoint3D() { X = (float)x.point.X, Y = (float)x.point.Y, Z = (float)x.point.Z }).ToArray();
             int rotatedPointsSize = 0;
             var rotatedPoints = new StructPoint3D[retDataBase.Count()];
 
-            NativeMethod.TransformPointCloud(retDataBase, rawVoxels.Count, rotatedPoints, ref rotatedPointsSize, roll, pitch, yaw, 0, 0, 0);
+            NativeMethod.TransformPointCloud(retDataBase, rawVoxels.Count, rotatedPoints, ref rotatedPointsSize, 0, 0, 0, x, y, z);
 
             var retData = new List<PointCloudVoxel>();
             for (int i = 0; i < rotatedPointsSize; i++)
