@@ -11,16 +11,16 @@ using System.Windows.Media;
 
 namespace PointCloudPlaneAnalyzer.Models.Implements
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct StructPoint3D
-    {
-        public float X;
-        public float Y;
-        public float Z;
-    };
 
     public class BasicPlaneDetecter : IPlaneDetect
     {
+        [StructLayout(LayoutKind.Sequential)]
+        public struct StructPoint3D
+        {
+            public float X;
+            public float Y;
+            public float Z;
+        };
 
         public List<PointCloudVoxel> GetPlaneVoxels(List<PointCloudVoxel> rawVoxels, int errorMm)
             => getPlaneVoxelsUseStructArray(rawVoxels, errorMm);
@@ -32,9 +32,8 @@ namespace PointCloudPlaneAnalyzer.Models.Implements
             var retDataBase = rawVoxels.Select(x => new StructPoint3D() { X = (float)x.point.X, Y = (float)x.point.Y, Z = (float)x.point.Z }).ToArray();
             int planeSize = 0;
             var planeData = new StructPoint3D[retDataBase.Count()];
-            var msg = new char[500];
 
-            NativeMethod.CalcPlaneStruct(retDataBase, rawVoxels.Count, planeData, ref planeSize, (float)(errorMm/1000.0));
+            NativeMethod.CalcPlaneStruct(retDataBase, rawVoxels.Count, planeData,ref planeSize, (float)(errorMm / 1000.0));
 
             var retData = new List<PointCloudVoxel>();
             for (int i = 0; i < planeSize; i++)
@@ -44,15 +43,15 @@ namespace PointCloudPlaneAnalyzer.Models.Implements
 
             return retData;
         }
-    }
-    public static class NativeMethod
-    {
+        public static class NativeMethod
+        {
 
 #if DEBUG
-        [DllImport("..\\..\\..\\..\\bin\\Debug\\PCLPlaneDetector.dll")]
+            [DllImport("..\\..\\..\\..\\bin\\Debug\\PCLPlaneDetector.dll")]
 #else
         [DllImport("..\\..\\..\\..\\bin\\Release\\PCLPlaneDetector.dll")]
 #endif
-        public static extern void CalcPlaneStruct([In, Out] StructPoint3D[] points, int elementCount, [In, Out] StructPoint3D[] returnData, ref int returnDataCount, float errorMm);
+            public static extern void CalcPlaneStruct([In, Out] StructPoint3D[] points, int elementCount, [In, Out] StructPoint3D[] returnData, ref int returnDataCount, float errorMm);
+        }
     }
 }

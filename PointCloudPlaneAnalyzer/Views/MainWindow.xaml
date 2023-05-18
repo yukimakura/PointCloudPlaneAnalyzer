@@ -13,10 +13,13 @@
         <Menu DockPanel.Dock="Top" Grid.Row="0">
             <MenuItem Header="ファイル">
                 <MenuItem Header="csvファイルを読み込む..." Command="{Binding LoadPCLCommand}" />
+                <MenuItem Header="点群をcsvに保存する..." Command="{Binding SaveRawPCLCommand}" />
             </MenuItem>
             <MenuItem Header="解析">
                 <MenuItem Header="平面を抽出する" Command="{Binding ExtractPlaneCommand}" />
                 <MenuItem Header="抽出した点群をcsvに出力..." Command="{Binding ExportCSVCommand}" />
+                <MenuItem Header="インポートした点群を回転する" Command="{Binding RotatePointCloudCommand}" />
+                
             </MenuItem>
         </Menu>
         <!--<ContentControl prism:RegionManager.RegionName="ContentRegion" />-->

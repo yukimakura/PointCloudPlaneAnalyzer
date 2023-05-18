@@ -3,6 +3,10 @@
 #include "dllExport.h"
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/filters/extract_indices.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/common/transforms.h>
+
 
 
 
@@ -11,6 +15,13 @@ typedef struct _StructPoint3D {
 	float Y;
 	float Z;
 }StructPoint3D;
+
+double degToRad(double deg)
+{
+	double rad = deg / 180.0 * M_PI;
+	rad = atan2(sin(rad), cos(rad));
+	return rad;
+}
 
 DLLEXPORT void __stdcall CalcPlaneStruct(StructPoint3D* points, int elementCount, StructPoint3D* returnData, int* returnDataCount,float errorMm)
 {
@@ -50,4 +61,26 @@ DLLEXPORT void __stdcall CalcPlaneStruct(StructPoint3D* points, int elementCount
 		returnData[i] = StructPoint3D{ plane_pointcloud[i].x, plane_pointcloud[i].y, plane_pointcloud[i].z };
 	}
 
+}
+
+DLLEXPORT void __stdcall TransfortPointCloud(StructPoint3D* points, int elementCount, StructPoint3D* returnData, int* returnDataCount,float roll,float pitch,float yaw)
+{
+	//“ü—Í“_ŒQ
+	pcl::PointCloud<pcl::PointXYZ> inputPointcloud;
+
+	for (size_t i = 0; i < elementCount; i++)
+	{
+		inputPointcloud.push_back(pcl::PointXYZ(points[i].X, points[i].Y, points[i].Z));
+	}
+
+	pcl::PointCloud<pcl::PointXYZ> rotatedPointcloud;
+	Eigen::Affine3f tf = pcl::getTransformation(0, 0, 0, degToRad(roll), degToRad(pitch), degToRad(yaw));
+	pcl::transformPointCloud(inputPointcloud, rotatedPointcloud, tf,true);
+
+	(*returnDataCount) = rotatedPointcloud.size();
+
+	for (size_t i = 0; i < (*returnDataCount); i++)
+	{
+		returnData[i] = StructPoint3D{ rotatedPointcloud[i].x, rotatedPointcloud[i].y, rotatedPointcloud[i].z };
+	}
 }
