@@ -17,6 +17,11 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using Prism.Regions;
+using PointCloudPlaneAnalyzer.Views;
+using MessagePipe;
+using System.Threading;
+using System.Transactions;
 
 namespace PointCloudPlaneAnalyzer.ViewModels
 {
@@ -25,6 +30,8 @@ namespace PointCloudPlaneAnalyzer.ViewModels
 
         private IReadPointCloud readPointCloud;
         private IPlaneDetect planeDetect;
+
+        private ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber;
 
 
         private string _title = "PointCloudPlaneAnalyzer";
@@ -41,10 +48,11 @@ namespace PointCloudPlaneAnalyzer.ViewModels
 
         private Model3D pclModel = new Model3DGroup();
 
-        public MainWindowViewModel(IReadPointCloud readPointCloud, IPlaneDetect planeDetect)
+        public MainWindowViewModel(IReadPointCloud readPointCloud, IPlaneDetect planeDetect, ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber)
         {
             this.readPointCloud = readPointCloud;
             this.planeDetect = planeDetect;
+            this.executePlainDetectSubscriber = executePlainDetectSubscriber;
         }
 
         public Model3D PCLModel
@@ -103,31 +111,40 @@ namespace PointCloudPlaneAnalyzer.ViewModels
                     return;
                 }
 
-                extractPointCloudVoxelList = planeDetect.GetPlaneVoxels(rawPointCloudVoxelList, 0);
+                var subwindow = new PlaneDetectWindow();
+                subwindow.Show();
 
-                // Create a model group
-                var modelGroup = new Model3DGroup();
-                // Create a mesh builder and add a box to it
-                var pointMeshBuilder = new MeshBuilder(false, false);
-                foreach (var pv in rawPointCloudVoxelList)
+                executePlainDetectSubscriber.Subscribe(detectProp =>
                 {
-                    pointMeshBuilder.AddBox(new Point3D(pv.point.Z, pv.point.X, -pv.point.Y), 0.003, 0.003, 0.003);
-                }
 
-                var pointMesh = pointMeshBuilder.ToMesh(true);
+                    subwindow.Close();
+                    extractPointCloudVoxelList = planeDetect.GetPlaneVoxels(rawPointCloudVoxelList, detectProp.errorMm);
 
-                var planeMeshBuilder = new MeshBuilder(false, false);
-                foreach (var pv in extractPointCloudVoxelList)
-                {
-                    planeMeshBuilder.AddBox(new Point3D(pv.point.Z, pv.point.X, -pv.point.Y), 0.003, 0.003, 0.003);
-                }
+                    // Create a model group
+                    var modelGroup = new Model3DGroup();
+                    // Create a mesh builder and add a box to it
+                    var pointMeshBuilder = new MeshBuilder(false, false);
+                    foreach (var pv in rawPointCloudVoxelList)
+                    {
+                        pointMeshBuilder.AddBox(new Point3D(pv.point.Z, pv.point.X, -pv.point.Y), 0.003, 0.003, 0.003);
+                    }
 
-                var planeMesh = planeMeshBuilder.ToMesh(true);
+                    var pointMesh = pointMeshBuilder.ToMesh(true);
 
-                modelGroup.Children.Add(genVoxel(pointMesh, new Point3D(0, 0, 0), Colors.Red));
-                modelGroup.Children.Add(genVoxel(planeMesh, new Point3D(0, 0, 0), Colors.Blue));
+                    var planeMeshBuilder = new MeshBuilder(false, false);
+                    foreach (var pv in extractPointCloudVoxelList)
+                    {
+                        planeMeshBuilder.AddBox(new Point3D(pv.point.Z, pv.point.X, -pv.point.Y), 0.003, 0.003, 0.003);
+                    }
 
-                PCLModel = modelGroup;
+                    var planeMesh = planeMeshBuilder.ToMesh(true);
+
+                    modelGroup.Children.Add(genVoxel(pointMesh, new Point3D(0, 0, 0), Colors.Red));
+                    modelGroup.Children.Add(genVoxel(planeMesh, new Point3D(0, 0, 0), Colors.Blue));
+
+                    PCLModel = modelGroup;
+
+                });
             });
         }
 
@@ -141,7 +158,7 @@ namespace PointCloudPlaneAnalyzer.ViewModels
                     MessageBox.Show("先に、「解析」→「平面を抽出する」を実行してください。");
                     return;
                 }
-                    
+
                 // ダイアログのインスタンスを生成
                 var dialog = new SaveFileDialog();
 
