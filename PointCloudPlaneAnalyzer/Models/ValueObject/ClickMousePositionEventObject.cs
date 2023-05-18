@@ -8,5 +8,5 @@ using System.Windows.Media.Media3D;
 
 namespace PointCloudPlaneAnalyzer.Models.ValueObject
 {
-    public record ClickPointCloudEventObject(Visual3D clickedObject);
+    public record ClickMousePositionEventObject(Point3D clickedMousePositon, Point3D? clickedObjectPositon);
 }

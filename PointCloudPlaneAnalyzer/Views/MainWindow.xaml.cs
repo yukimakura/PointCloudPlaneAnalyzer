@@ -4,6 +4,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using MessagePipe;
 using PointCloudPlaneAnalyzer.Models.ValueObject;
+using System.Printing.IndexedProperties;
 
 namespace PointCloudPlaneAnalyzer.Views
 {
@@ -12,23 +13,27 @@ namespace PointCloudPlaneAnalyzer.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        private IPublisher<ClickPointCloudEventObject> clickPointCloudPublish;
-        public MainWindow(IPublisher<ClickPointCloudEventObject> clickPointCloudPublish)
+        private IPublisher<ClickMousePositionEventObject> clickMousePositionPublish;
+        public MainWindow(IPublisher<ClickMousePositionEventObject> clickPointCloudPublish)
         {
             InitializeComponent();
-            this.clickPointCloudPublish = clickPointCloudPublish;
+            this.clickMousePositionPublish = clickPointCloudPublish;
+
 
         }
 
         private void HelixViewport3D_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var p = e.GetPosition(this.helixView);
-            var hit = Viewport3DHelper.FindNearestVisual(this.helixView.Viewport, p);
 
-            if (hit != null)
-            {
-                clickPointCloudPublish.Publish(new ClickPointCloudEventObject(hit));
-            }
+            if (!helixView.CursorPosition.HasValue)
+                return;
+
+            var pubobj = new ClickMousePositionEventObject(helixView.CursorPosition.Value, null);
+
+            if (helixView.CursorOnElementPosition.HasValue)
+                pubobj = pubobj with { clickedObjectPositon = helixView.CursorOnElementPosition.Value };
+            
+            clickMousePositionPublish.Publish(pubobj);
         }
     }
 }

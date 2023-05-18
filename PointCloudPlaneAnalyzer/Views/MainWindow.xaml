@@ -24,7 +24,7 @@
             </MenuItem>
         </Menu>
         <!--<ContentControl prism:RegionManager.RegionName="ContentRegion" />-->
-        <ht:HelixViewport3D x:Name="helixView" ZoomExtentsWhenLoaded="True" Grid.Row="1" MouseDown="HelixViewport3D_MouseDown">
+        <ht:HelixViewport3D x:Name="helixView" ZoomExtentsWhenLoaded="True" Grid.Row="1" MouseDown="HelixViewport3D_MouseDown" Cursor="Cross" CalculateCursorPosition="True" ShowFrameRate="True">
             <ht:GridLinesVisual3D Width="10" Length="10" MinorDistance="1" MajorDistance="1" Thickness="0.02"/>
             <ModelVisual3D x:Name="main3dview" Content="{Binding PCLModel, Mode=OneWay}"/>
             <ht:SunLight/>
@@ -33,4 +33,5 @@
             <Label Content="{Binding SelectingPointInfo}"/>
         </StatusBar>
     </Grid>
+    
 </Window>

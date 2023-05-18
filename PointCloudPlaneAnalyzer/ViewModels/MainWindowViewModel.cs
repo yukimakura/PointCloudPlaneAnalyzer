@@ -34,7 +34,7 @@ namespace PointCloudPlaneAnalyzer.ViewModels
 
         private ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber;
         private ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber;
-        private ISubscriber<ClickPointCloudEventObject> clickPointCloudSubscriber;
+        private ISubscriber<ClickMousePositionEventObject> clickMousePositionSubscriber;
 
 
         private string _title = "PointCloudPlaneAnalyzer";
@@ -62,7 +62,7 @@ namespace PointCloudPlaneAnalyzer.ViewModels
                                    IRotatePointCloud rotatePointCloud,
                                    ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber,
                                    ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber,
-                                   ISubscriber<ClickPointCloudEventObject> clickPointCloudSubscriber
+                                   ISubscriber<ClickMousePositionEventObject> clickMousePositionSubscriber
                                    )
         {
             this.readPointCloud = readPointCloud;
@@ -70,9 +70,10 @@ namespace PointCloudPlaneAnalyzer.ViewModels
             this.executePlainDetectSubscriber = executePlainDetectSubscriber;
             this.rotatePointCloudSubscriber = rotatePointCloudSubscriber;
             this.rotatePointCloud = rotatePointCloud;
-            this.clickPointCloudSubscriber = clickPointCloudSubscriber;
-            this.clickPointCloudSubscriber.Subscribe(clickPoint => {
-                SelectingPointInfo = string.Join(",",((ModelVisual3D)clickPoint.clickedObject).Children.Select(x => $"[X:{((ModelVisual3D)x).Content.Bounds.X} Y:{((ModelVisual3D)x).Content.Bounds.Y} Z:{((ModelVisual3D)x).Content.Bounds.Z}]"));
+            this.clickMousePositionSubscriber = clickMousePositionSubscriber;
+            this.clickMousePositionSubscriber.Subscribe(clickPoint => {
+                SelectingPointInfo = $"最後にクリックされたマウス座標:[X:{clickPoint.clickedMousePositon.X},Y:{clickPoint.clickedMousePositon.Y},Z:{clickPoint.clickedMousePositon.Z}] " +
+                                        $"{(clickPoint.clickedObjectPositon.HasValue ? $"最後にクリックされたオブジェクト座標 :[X:{clickPoint.clickedObjectPositon.Value.X}, Y:{clickPoint.clickedObjectPositon.Value.Y}, Z:{clickPoint.clickedObjectPositon.Value.Z}]" : string.Empty)}";
             });
         }
 
