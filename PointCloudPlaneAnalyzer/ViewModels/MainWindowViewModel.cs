@@ -34,6 +34,7 @@ namespace PointCloudPlaneAnalyzer.ViewModels
 
         private ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber;
         private ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber;
+        private ISubscriber<ClickPointCloudEventObject> clickPointCloudSubscriber;
 
 
         private string _title = "PointCloudPlaneAnalyzer";
@@ -43,6 +44,12 @@ namespace PointCloudPlaneAnalyzer.ViewModels
             set { SetProperty(ref _title, value); }
         }
 
+        private string selectingPointInfo = string.Empty;
+        public string SelectingPointInfo
+        {
+            get { return selectingPointInfo; }
+            set { SetProperty(ref selectingPointInfo, value); }
+        }
 
         private List<PointCloudVoxel> rawPointCloudVoxelList = new List<PointCloudVoxel>();
         private List<PointCloudVoxel> extractPointCloudVoxelList = new List<PointCloudVoxel>();
@@ -50,13 +57,23 @@ namespace PointCloudPlaneAnalyzer.ViewModels
 
         private Model3D pclModel = new Model3DGroup();
 
-        public MainWindowViewModel(IReadPointCloud readPointCloud, IPlaneDetect planeDetect, IRotatePointCloud rotatePointCloud, ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber, ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber)
+        public MainWindowViewModel(IReadPointCloud readPointCloud,
+                                   IPlaneDetect planeDetect,
+                                   IRotatePointCloud rotatePointCloud,
+                                   ISubscriber<ExecutePlainDetectEventObject> executePlainDetectSubscriber,
+                                   ISubscriber<RotatePointCloudEventObject> rotatePointCloudSubscriber,
+                                   ISubscriber<ClickPointCloudEventObject> clickPointCloudSubscriber
+                                   )
         {
             this.readPointCloud = readPointCloud;
             this.planeDetect = planeDetect;
             this.executePlainDetectSubscriber = executePlainDetectSubscriber;
             this.rotatePointCloudSubscriber = rotatePointCloudSubscriber;
             this.rotatePointCloud = rotatePointCloud;
+            this.clickPointCloudSubscriber = clickPointCloudSubscriber;
+            this.clickPointCloudSubscriber.Subscribe(clickPoint => {
+                SelectingPointInfo = string.Join(",",((ModelVisual3D)clickPoint.clickedObject).Children.Select(x => $"[X:{((ModelVisual3D)x).Content.Bounds.X} Y:{((ModelVisual3D)x).Content.Bounds.Y} Z:{((ModelVisual3D)x).Content.Bounds.Z}]"));
+            });
         }
 
         public Model3D PCLModel
